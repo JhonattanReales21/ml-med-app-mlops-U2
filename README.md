@@ -49,7 +49,7 @@ streamlit run app.py
 ```
 
 Por defecto, Streamlit levantará la app en:
-- [http](http://localhost:8501), o en su defecto [http](http://localhost:8502)
+- http://localhost:8501, o en su defecto http://localhost:8502
 
 ---
 
