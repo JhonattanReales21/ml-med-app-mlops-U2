@@ -15,4 +15,4 @@ COPY . /app
 EXPOSE 8000
 
 # Comando por defecto (Flask dev server en contenedor)
-CMD ["python", "app.py"]
+CMD ["streamlit", "run", "app.py", "--server.port=8000"]

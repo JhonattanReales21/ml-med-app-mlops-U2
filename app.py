@@ -1,41 +1,71 @@
 # app.py
-from flask import Flask, request, jsonify, render_template
+import streamlit as st
 from rules import PatientInput, predict_state
 
-app = Flask(__name__)
+# Configuración básica de la página
+st.set_page_config(
+    page_title="Clasificador de Enfermedades",
+    page_icon="🏥",
+    layout="centered",
+)
 
-@app.route("/")
-def home():
-    return render_template("index.html")
+st.title("Clasificador de Enfermedades")
+st.write(
+    """
+Esta aplicación simula un **modelo médico basado en reglas**.
+Ingresa los datos del paciente y obtendrás un estado estimado junto con una breve explicación.
+"""
+)
 
-@app.route("/predict", methods=["POST"])
-def predict():
+# --- Formulario de entrada ---
+with st.form("patient_form"):
+    age = st.number_input("Edad (años)", min_value=0, max_value=120, value=30, step=1)
+    severity = st.slider(
+        "Severidad de síntomas (0–10)",
+        min_value=0.0,
+        max_value=10.0,
+        value=4.0,
+        step=0.1,
+    )
+    duration_days = st.number_input(
+        "Duración de los síntomas (días)", min_value=0, max_value=365, value=3, step=1
+    )
+
+    submitted = st.form_submit_button("Predecir")
+
+# --- Lógica de predicción ---
+if submitted:
     try:
-        data = request.get_json(silent=True)
-        if data is None:
-            # También soporta form-data (desde el HTML)
-            data = {
-                "age": request.form.get("age", type=int),
-                "severity": request.form.get("severity", type=float),
-                "duration_days": request.form.get("duration_days", type=int),
-            }
+        patient = PatientInput(
+            age=int(age),
+            severity=float(severity),
+            duration_days=int(duration_days),
+        )
+        state, explanation = predict_state(patient)
 
-        age = int(data["age"]) if data.get("age") is not None else None
-        severity = float(data["severity"]) if data.get("severity") is not None else None
-        duration_days = int(data["duration_days"]) if data.get("duration_days") is not None else None
+        if state == "NO ENFERMO":
+            st.success(f"✅ Estado estimado: **{state}**")
+        elif state in ["ENFERMEDAD CRÓNICA", "ENFERMEDAD AGUDA"]:
+            st.error(f"❗️ Estado estimado: **{state}**")
+        else:
+            st.info(f"🔵 Estado estimado: **{state}**")
 
-        if age is None or severity is None or duration_days is None:
-            return jsonify({"error": "Faltan parámetros: age, severity, duration_days"}), 400
+        st.markdown(f"**Explicación:** {explanation}")
 
-        state, explanation = predict_state(PatientInput(age=age, severity=severity, duration_days=duration_days))
-        return jsonify({
-            "state": state,
-            "explanation": explanation,
-            "inputs": {"age": age, "severity": severity, "duration_days": duration_days}
-        })
+        with st.expander("Ver detalle de los datos de entrada"):
+            st.json(
+                {
+                    "age": patient.age,
+                    "severity": patient.severity,
+                    "duration_days": patient.duration_days,
+                }
+            )
+
     except Exception as e:
-        return jsonify({"error": str(e)}), 400
+        st.error(f"⚠️ Ocurrió un error al calcular la predicción: {e}")
 
-if __name__ == "__main__":
-    # Para desarrollo local (no en Docker)
-    app.run(host="0.0.0.0", port=8000, debug=True)
+st.markdown("---")
+st.caption(
+    "Lógica de clasificación definida en `rules.py`. "
+    "Este demo es únicamente educativo y **no** reemplaza criterio médico profesional."
+)
