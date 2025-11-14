@@ -13,7 +13,6 @@ class PatientInput:
     is_bedridden: bool  # pasa la mayor parte del día encamado
     refractory_pain: bool  # dolor intenso pese a tratamiento
     multiple_organ_failure: bool  # falla de ≥2 órganos
-
     has_recent_imaging: bool  # ¿se cargó imagen diagnóstica reciente?
 
 
