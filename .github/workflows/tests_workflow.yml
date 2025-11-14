@@ -1,0 +1,43 @@
+name: Tests - Continous Integration
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Comment PR - Started
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          message: "CI/CD en acción. Ejecutando tareas..."
+          reactions: rocket
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install testing tools
+        run: pip install pytest
+
+      - name: Run tests
+        run: pytest -v
+
+      - name: Comment PR - Completed
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          message: "CI/CD terminado con éxito."
+          reactions: hooray
+       
