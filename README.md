@@ -4,7 +4,7 @@ Esta aplicación es una **simulación de un modelo médico** desarrollada en Str
 El objetivo es predecir un **estado de enfermedad** (no enfermo, leve, aguda, crónica o terminal) a partir de datos básicos del paciente.  
 La lógica se implementa mediante reglas definidas en el archivo `rules.py` y se registra el histórico de predicciones para generar un pequeño reporte.
 
-> ⚠️ **Aviso:** Este proyecto es únicamente para fines educativos y de demostración de MLOps / prototipado.  
+> **Aviso:** Este proyecto es únicamente para fines educativos y de demostración de MLOps / prototipado.  
 > No debe utilizarse para soporte real a la decisión clínica.
 
 ---
